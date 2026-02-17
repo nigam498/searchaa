@@ -6,6 +6,18 @@
     <title>Document</title>
 </head>
 <body>
-    <script src="https://www.googletagmanager.com/gtag/js?id=hello"></script>
+    <!-- Load gtag.js -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=hello"></script>
+
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+
+  gtag('js', new Date());
+
+  // Configure with your ID
+  gtag('config', 'hello');
+</script>
+
 </body>
 </html>
