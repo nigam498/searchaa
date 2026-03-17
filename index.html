@@ -3,86 +3,70 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Header → Burp Request Converter</title>
+<title>Advanced Burp Request Converter</title>
 <style>
-body {
-  font-family: Arial, sans-serif;
-  background: #0f172a;
-  color: #e2e8f0;
-  padding: 20px;
-}
-.container {
-  max-width: 900px;
-  margin: auto;
-}
-textarea {
-  width: 100%;
-  height: 180px;
-  margin-top: 10px;
-  padding: 10px;
-  border-radius: 10px;
-  border: none;
-  background: #1e293b;
-  color: white;
-}
-button {
-  margin-top: 10px;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 10px;
-  background: #38bdf8;
-  color: black;
-  cursor: pointer;
-  font-weight: bold;
-}
-button:hover {
-  background: #0ea5e9;
-}
+body { font-family: Arial; background:#0f172a; color:#e2e8f0; padding:20px; }
+.container { max-width:1000px; margin:auto; }
+textarea { width:100%; height:200px; margin-top:10px; padding:10px; border-radius:10px; border:none; background:#1e293b; color:#fff; }
+button { margin-top:10px; padding:10px 20px; border:none; border-radius:10px; background:#38bdf8; cursor:pointer; font-weight:bold; }
 </style>
 </head>
 <body>
 <div class="container">
-<h2>Chrome Headers → Burp Request</h2>
-<p>Paste raw headers (from DevTools) below:</p>
+<h2>🔥 Advanced Chrome → Burp Converter</h2>
 
-<textarea id="input"></textarea>
+<textarea id="input" placeholder=":method GET\n:authority example.com\n:path /test\naccept: */*"></textarea>
 <button onclick="convert()">Convert</button>
 
-<p>Burp Request Output:</p>
-<textarea id="output"></textarea>
+<textarea id="output" placeholder="Burp request will appear here..."></textarea>
 </div>
 
 <script>
-function convert() {
-  const input = document.getElementById("input").value;
-  const lines = input.split("\n");
+function convert(){
+  const raw = document.getElementById('input').value;
+  const lines = raw.split('\n');
 
-  let method = "GET";
-  let path = "/";
-  let host = "";
-  let headers = [];
+  let method = '';
+  let path = '';
+  let host = '';
+  let headers = {};
 
-  lines.forEach(line => {
-    line = line.trim();
+  lines.forEach(l => {
+    let line = l.trim();
+    if(!line) return;
 
-    if (line.startsWith(":method")) {
-      method = line.split("\t").pop().trim();
-    } else if (line.startsWith(":path")) {
-      path = line.split("\t").pop().trim();
-    } else if (line.startsWith(":authority")) {
-      host = line.split("\t").pop().trim();
-    } else if (!line.startsWith(":")) {
-      headers.push(line);
+    // normalize tab or space split
+    let parts = line.split(/\s+/);
+
+    if(line.startsWith(':method')) method = parts.pop();
+    else if(line.startsWith(':path')) path = parts.pop();
+    else if(line.startsWith(':authority')) host = parts.pop();
+    else if(line.startsWith(':scheme')) return;
+    else {
+      let idx = line.indexOf(':');
+      if(idx !== -1){
+        let key = line.substring(0, idx).trim();
+        let val = line.substring(idx+1).trim();
+
+        // merge cookies properly
+        if(key.toLowerCase() === 'cookie'){
+          headers['Cookie'] = (headers['Cookie'] ? headers['Cookie'] + '; ' : '') + val;
+        } else {
+          headers[key.replace(/(^.|-.)/g, s => s.toUpperCase())] = val;
+        }
+      }
     }
   });
 
-  let result = `${method} ${path} HTTP/2\nHost: ${host}\n`;
+  // build request
+  let result = `${method} ${path} HTTP/2\n`;
+  result += `Host: ${host}\n`;
 
-  headers.forEach(h => {
-    if (h) result += h + "\n";
-  });
+  for(let key in headers){
+    result += `${key}: ${headers[key]}\n`;
+  }
 
-  document.getElementById("output").value = result;
+  document.getElementById('output').value = result;
 }
 </script>
 </body>
