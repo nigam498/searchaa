@@ -1,10 +1,89 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Header → Burp Request Converter</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #0f172a;
+  color: #e2e8f0;
+  padding: 20px;
+}
+.container {
+  max-width: 900px;
+  margin: auto;
+}
+textarea {
+  width: 100%;
+  height: 180px;
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  background: #1e293b;
+  color: white;
+}
+button {
+  margin-top: 10px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 10px;
+  background: #38bdf8;
+  color: black;
+  cursor: pointer;
+  font-weight: bold;
+}
+button:hover {
+  background: #0ea5e9;
+}
+</style>
+</head>
 <body>
+<div class="container">
+<h2>Chrome Headers → Burp Request</h2>
+<p>Paste raw headers (from DevTools) below:</p>
+
+<textarea id="input"></textarea>
+<button onclick="convert()">Convert</button>
+
+<p>Burp Request Output:</p>
+<textarea id="output"></textarea>
+</div>
+
 <script>
+function convert() {
+  const input = document.getElementById("input").value;
+  const lines = input.split("\n");
 
-  window.location ="data:image/svg+xml,%3Csvg%20version%3D%271.1%27%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20xmlns%3Axlink%3D%27http%3A//www.w3.org/1999/xlink%27%20x%3D%270px%27%20y%3D%270px%27%20enable-background%3D%27new%200%200%205%202%27%20xml%3Aspace%3D%27preserve%27%20viewBox%3D%270%200%205%202%27%20preserveAspectRatio%3D%27xMinYMin%20slice%27%3E%3Ccircle%20cx%3D%271%27%20cy%3D%271%27%20r%3D%271%27/%3E%3Cscript%3Ealert(document.domain)%3B%3C/script%3E%3C/svg%3E";
- </script>
+  let method = "GET";
+  let path = "/";
+  let host = "";
+  let headers = [];
 
-  </body>
+  lines.forEach(line => {
+    line = line.trim();
+
+    if (line.startsWith(":method")) {
+      method = line.split("\t").pop().trim();
+    } else if (line.startsWith(":path")) {
+      path = line.split("\t").pop().trim();
+    } else if (line.startsWith(":authority")) {
+      host = line.split("\t").pop().trim();
+    } else if (!line.startsWith(":")) {
+      headers.push(line);
+    }
+  });
+
+  let result = `${method} ${path} HTTP/2\nHost: ${host}\n`;
+
+  headers.forEach(h => {
+    if (h) result += h + "\n";
+  });
+
+  document.getElementById("output").value = result;
+}
+</script>
+</body>
 </html>
