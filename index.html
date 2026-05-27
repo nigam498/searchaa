@@ -1,73 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Advanced Burp Request Converter</title>
-<style>
-body { font-family: Arial; background:#0f172a; color:#e2e8f0; padding:20px; }
-.container { max-width:1000px; margin:auto; }
-textarea { width:100%; height:200px; margin-top:10px; padding:10px; border-radius:10px; border:none; background:#1e293b; color:#fff; }
-button { margin-top:10px; padding:10px 20px; border:none; border-radius:10px; background:#38bdf8; cursor:pointer; font-weight:bold; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO -->
+    <title>Minimal SVG Circle Example</title>
+    <meta name="description" content="A simple SEO friendly blog demonstrating inline SVG data URI usage in HTML.">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Minimal SVG Circle Example">
+    <meta property="og:description" content="Learn how SVG data URI images work in HTML and SEO.">
+    <meta property="og:type" content="article">
+
+    <!-- Canonical -->
+    <link rel="canonical" href="https://example.com/svg-blog">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: auto;
+            padding: 40px;
+            line-height: 1.7;
+        }
+
+        img {
+            width: 120px;
+            height: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+
+        article {
+            margin-top: 30px;
+        }
+    </style>
 </head>
 <body>
-<div class="container">
-<h2>🔥 Advanced Chrome → Burp Converter</h2>
 
-<textarea id="input" placeholder=":method GET\n:authority example.com\n:path /test\naccept: */*"></textarea>
-<button onclick="convert()">Convert</button>
+    <header>
+        <h1>Using SVG Data URI Images in HTML</h1>
+    </header>
 
-<textarea id="output" placeholder="Burp request will appear here..."></textarea>
-</div>
+    <main>
+        <article>
+            <h2>Example SVG Image</h2>
 
-<script>
-function convert(){
-  const raw = document.getElementById('input').value;
-  const lines = raw.split('\n');
+            <img
+                src="data:image/svg+xml,<svg version%3D%271.1%27 xmlns%3D%27http%3A//www.w3.org/2000/svg%27 xmlns%3Axlink%3D%27http%3A//www.w3.org/1999/xlink%27 x%3D%270px%27 y%3D%270px%27 enable-background%3D%27new 0 0 5 2%27 xml%3Aspace%3D%27preserve%27 viewBox%3D%270 0 5 2%27 preserveAspectRatio%3D%27xMinYMin slice%27><circle cx%3D%271%27 cy%3D%271%27 r%3D%271%27/><script>alert(document.cookie)%3B</script></svg>"
+                alt="Minimal black SVG circle illustration"
+                loading="lazy"
+            >
 
-  let method = '';
-  let path = '';
-  let host = '';
-  let headers = {};
+            <p>
+                This example demonstrates how SVG data URIs can be embedded directly into HTML images.
+                Search engines can understand the surrounding page content and alt text for SEO purposes.
+            </p>
 
-  lines.forEach(l => {
-    let line = l.trim();
-    if(!line) return;
+            <h2>Benefits of SVG</h2>
 
-    // normalize tab or space split
-    let parts = line.split(/\s+/);
+            <ul>
+                <li>Small file size</li>
+                <li>Scales without losing quality</li>
+                <li>Good for icons and diagrams</li>
+                <li>Can be embedded directly into HTML</li>
+            </ul>
 
-    if(line.startsWith(':method')) method = parts.pop();
-    else if(line.startsWith(':path')) path = parts.pop();
-    else if(line.startsWith(':authority')) host = parts.pop();
-    else if(line.startsWith(':scheme')) return;
-    else {
-      let idx = line.indexOf(':');
-      if(idx !== -1){
-        let key = line.substring(0, idx).trim();
-        let val = line.substring(idx+1).trim();
+            <h2>SEO Tips</h2>
 
-        // merge cookies properly
-        if(key.toLowerCase() === 'cookie'){
-          headers['Cookie'] = (headers['Cookie'] ? headers['Cookie'] + '; ' : '') + val;
-        } else {
-          headers[key.replace(/(^.|-.)/g, s => s.toUpperCase())] = val;
-        }
-      }
-    }
-  });
+            <p>
+                Always use descriptive alt text, meaningful headings, and relevant surrounding content
+                when using SVG images on websites.
+            </p>
+        </article>
+    </main>
 
-  // build request
-  let result = `${method} ${path} HTTP/2\n`;
-  result += `Host: ${host}\n`;
-
-  for(let key in headers){
-    result += `${key}: ${headers[key]}\n`;
-  }
-
-  document.getElementById('output').value = result;
-}
-</script>
 </body>
 </html>
